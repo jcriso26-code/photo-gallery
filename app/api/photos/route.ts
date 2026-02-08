@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
+let redis: Redis;
+
+try {
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    throw new Error("Upstash credentials missing");
+  }
+  
+  redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL,
+    token: process.env.UPSTASH_REDIS_REST_TOKEN,
+  });
+} catch (error) {
+  console.error("Redis initialization error:", error);
+}
 
 const PHOTOS_KEY = "portfolio:photos";
 
@@ -18,6 +28,13 @@ export interface Photo {
 // GET - Obtener todas las fotos (con filtro opcional por categoría)
 export async function GET(request: NextRequest) {
   try {
+    if (!redis) {
+      return NextResponse.json(
+        { error: "Base de datos no configurada" },
+        { status: 500 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
 
@@ -29,15 +46,25 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ photos });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error al obtener fotos:", error);
-    return NextResponse.json({ photos: [] });
+    return NextResponse.json({ 
+      error: error.message || "Error al obtener fotos",
+      photos: [] 
+    });
   }
 }
 
 // POST - Agregar nueva foto
 export async function POST(request: NextRequest) {
   try {
+    if (!redis) {
+      return NextResponse.json(
+        { error: "Base de datos no configurada" },
+        { status: 500 }
+      );
+    }
+
     const { url, category, title } = await request.json();
     
     if (!url || !category) {
@@ -59,10 +86,10 @@ export async function POST(request: NextRequest) {
     await redis.set(PHOTOS_KEY, photos);
 
     return NextResponse.json({ success: true, photos });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error al guardar foto:", error);
     return NextResponse.json(
-      { error: "Error al guardar foto" },
+      { error: error.message || "Error al guardar foto" },
       { status: 500 }
     );
   }
@@ -71,6 +98,13 @@ export async function POST(request: NextRequest) {
 // DELETE - Eliminar foto
 export async function DELETE(request: NextRequest) {
   try {
+    if (!redis) {
+      return NextResponse.json(
+        { error: "Base de datos no configurada" },
+        { status: 500 }
+      );
+    }
+
     const { index } = await request.json();
     
     if (typeof index !== "number") {
@@ -85,10 +119,10 @@ export async function DELETE(request: NextRequest) {
     await redis.set(PHOTOS_KEY, photos);
 
     return NextResponse.json({ success: true, photos });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error al eliminar foto:", error);
     return NextResponse.json(
-      { error: "Error al eliminar foto" },
+      { error: error.message || "Error al eliminar foto" },
       { status: 500 }
     );
   }

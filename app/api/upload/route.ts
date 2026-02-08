@@ -9,6 +9,17 @@ cloudinary.config({
 
 export async function POST(request: NextRequest) {
   try {
+    // Verificar configuración
+    if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 
+        !process.env.CLOUDINARY_API_KEY || 
+        !process.env.CLOUDINARY_API_SECRET) {
+      console.error("Cloudinary credentials missing");
+      return NextResponse.json(
+        { error: "Configuración de Cloudinary incompleta" },
+        { status: 500 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
 
@@ -29,8 +40,12 @@ export async function POST(request: NextRequest) {
           resource_type: "auto",
         },
         (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+          if (error) {
+            console.error("Cloudinary upload error:", error);
+            reject(error);
+          } else {
+            resolve(result);
+          }
         }
       );
 
@@ -41,10 +56,10 @@ export async function POST(request: NextRequest) {
       url: (result as any).secure_url,
       publicId: (result as any).public_id,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error al subir a Cloudinary:", error);
     return NextResponse.json(
-      { error: "Error al subir la imagen" },
+      { error: error.message || "Error al subir la imagen" },
       { status: 500 }
     );
   }
