@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 
+export interface Photo {
+  url: string;
+  category: string;
+  title?: string;
+  date: string;
+}
+
 interface GalleryProps {
-  photos: string[];
+  photos: Photo[];
 }
 
 export default function Gallery({ photos }: GalleryProps) {
@@ -45,8 +51,8 @@ export default function Gallery({ photos }: GalleryProps) {
             onClick={() => openLightbox(index)}
           >
             <Image
-              src={photo}
-              alt={`Foto ${index + 1}`}
+              src={photo.url}
+              alt={photo.title || `Foto ${index + 1}`}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -57,6 +63,11 @@ export default function Gallery({ photos }: GalleryProps) {
                   🔍
                 </div>
               </div>
+              {photo.title && (
+                <div className="absolute bottom-4 left-4 right-4">
+                  <p className="text-white font-medium text-sm">{photo.title}</p>
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -104,8 +115,8 @@ export default function Gallery({ photos }: GalleryProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={photos[currentImage]}
-              alt={`Foto ${currentImage + 1}`}
+              src={photos[currentImage].url}
+              alt={photos[currentImage].title || `Foto ${currentImage + 1}`}
               fill
               className="object-contain"
               sizes="100vw"
@@ -113,12 +124,19 @@ export default function Gallery({ photos }: GalleryProps) {
             />
           </div>
 
-          {/* Counter */}
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white text-lg">
-            {currentImage + 1} / {photos.length}
+          {/* Info */}
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-center">
+            <p className="text-white text-lg mb-1">
+              {currentImage + 1} / {photos.length}
+            </p>
+            {photos[currentImage].title && (
+              <p className="text-white/80 text-sm">{photos[currentImage].title}</p>
+            )}
           </div>
         </div>
       )}
     </>
   );
 }
+
+import { useState } from "react";

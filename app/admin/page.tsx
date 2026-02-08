@@ -2,15 +2,27 @@
 
 import { useState, useEffect } from "react";
 import UploadZone from "@/components/UploadZone";
+import { Photo } from "@/components/Gallery";
+
+const CATEGORIES = [
+  { id: "retratos", name: "Retratos", icon: "👤" },
+  { id: "bodas", name: "Bodas", icon: "💍" },
+  { id: "paisajes", name: "Paisajes", icon: "🏔️" },
+  { id: "eventos", name: "Eventos", icon: "🎉" },
+  { id: "productos", name: "Productos", icon: "📦" },
+  { id: "arquitectura", name: "Arquitectura", icon: "🏛️" },
+  { id: "naturaleza", name: "Naturaleza", icon: "🌿" },
+];
 
 export default function AdminPage() {
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>([]);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("retratos");
+  const [photoTitle, setPhotoTitle] = useState("");
 
-  // Contraseña (cámbiala por una segura)
   const ADMIN_PASSWORD = "admin123";
 
   useEffect(() => {
@@ -46,7 +58,6 @@ export default function AdminPage() {
     formData.append("file", file);
 
     try {
-      // 1. Subir a Cloudinary
       const uploadResponse = await fetch("/api/upload", {
         method: "POST",
         body: formData,
@@ -56,19 +67,23 @@ export default function AdminPage() {
 
       const uploadData = await uploadResponse.json();
 
-      // 2. Guardar URL en la base de datos
       const saveResponse = await fetch("/api/photos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: uploadData.url }),
+        body: JSON.stringify({ 
+          url: uploadData.url,
+          category: selectedCategory,
+          title: photoTitle,
+        }),
       });
 
       if (!saveResponse.ok) throw new Error("Error al guardar en BD");
 
       const saveData = await saveResponse.json();
       setPhotos(saveData.photos);
+      setPhotoTitle("");
       
-      alert("✅ Foto subida y guardada exitosamente!");
+      alert("✅ Foto subida exitosamente!");
     } catch (error) {
       console.error("Error:", error);
       alert("❌ Error al subir la foto. Intenta de nuevo.");
@@ -153,6 +168,44 @@ export default function AdminPage() {
             <h2 className="text-2xl font-semibold text-slate-800 mb-4">
               Subir Nueva Foto
             </h2>
+            
+            {/* Category Selection */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-700 mb-3">
+                Categoría
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {CATEGORIES.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                      selectedCategory === cat.id
+                        ? "bg-blue-600 text-white shadow-lg"
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    }`}
+                  >
+                    <span className="mr-2">{cat.icon}</span>
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Title Input */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Título (opcional)
+              </label>
+              <input
+                type="text"
+                value={photoTitle}
+                onChange={(e) => setPhotoTitle(e.target.value)}
+                placeholder="Ej: Atardecer en la playa"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
             <UploadZone onUpload={handleUpload} uploading={uploading} />
           </div>
         </div>
@@ -175,16 +228,24 @@ export default function AdminPage() {
               {photos.map((photo, index) => (
                 <div key={index} className="relative group">
                   <img
-                    src={photo}
-                    alt={`Foto ${index + 1}`}
+                    src={photo.url}
+                    alt={photo.title || `Foto ${index + 1}`}
                     className="w-full h-48 object-cover rounded-lg"
                   />
-                  <button
-                    onClick={() => handleDelete(index)}
-                    className="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
-                  >
-                    🗑️
-                  </button>
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex flex-col items-center justify-center p-2">
+                    <span className="text-white text-xs font-medium mb-1">
+                      {CATEGORIES.find(c => c.id === photo.category)?.icon} {CATEGORIES.find(c => c.id === photo.category)?.name}
+                    </span>
+                    {photo.title && (
+                      <p className="text-white text-xs text-center mb-2">{photo.title}</p>
+                    )}
+                    <button
+                      onClick={() => handleDelete(index)}
+                      className="bg-red-600 text-white px-3 py-1 rounded-full text-sm hover:bg-red-700 transition-colors"
+                    >
+                      🗑️ Eliminar
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -197,7 +258,7 @@ export default function AdminPage() {
               </h3>
               <p className="text-sm text-green-700">
                 Todas las fotos que subas aquí aparecerán automáticamente en tu portfolio público.
-                No necesitas hacer nada más.
+                Los visitantes pueden filtrar por categoría.
               </p>
             </div>
           )}

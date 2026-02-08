@@ -8,10 +8,26 @@ const redis = new Redis({
 
 const PHOTOS_KEY = "portfolio:photos";
 
-// GET - Obtener todas las fotos
-export async function GET() {
+export interface Photo {
+  url: string;
+  category: string;
+  title?: string;
+  date: string;
+}
+
+// GET - Obtener todas las fotos (con filtro opcional por categoría)
+export async function GET(request: NextRequest) {
   try {
-    const photos = await redis.get<string[]>(PHOTOS_KEY) || [];
+    const { searchParams } = new URL(request.url);
+    const category = searchParams.get("category");
+
+    const photos = await redis.get<Photo[]>(PHOTOS_KEY) || [];
+    
+    if (category && category !== "all") {
+      const filtered = photos.filter(p => p.category === category);
+      return NextResponse.json({ photos: filtered });
+    }
+
     return NextResponse.json({ photos });
   } catch (error) {
     console.error("Error al obtener fotos:", error);
@@ -22,17 +38,24 @@ export async function GET() {
 // POST - Agregar nueva foto
 export async function POST(request: NextRequest) {
   try {
-    const { url } = await request.json();
+    const { url, category, title } = await request.json();
     
-    if (!url) {
+    if (!url || !category) {
       return NextResponse.json(
-        { error: "URL requerida" },
+        { error: "URL y categoría requeridas" },
         { status: 400 }
       );
     }
 
-    const photos = await redis.get<string[]>(PHOTOS_KEY) || [];
-    photos.push(url);
+    const photos = await redis.get<Photo[]>(PHOTOS_KEY) || [];
+    const newPhoto: Photo = {
+      url,
+      category,
+      title: title || "",
+      date: new Date().toISOString(),
+    };
+    
+    photos.push(newPhoto);
     await redis.set(PHOTOS_KEY, photos);
 
     return NextResponse.json({ success: true, photos });
@@ -57,7 +80,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const photos = await redis.get<string[]>(PHOTOS_KEY) || [];
+    const photos = await redis.get<Photo[]>(PHOTOS_KEY) || [];
     photos.splice(index, 1);
     await redis.set(PHOTOS_KEY, photos);
 
