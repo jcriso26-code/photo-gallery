@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Galería de Fotos",
-  description: "Sube y comparte tus fotografías",
+  title: "Galería Fotográfica | Portfolio Profesional",
+  description: "Galería de fotografía profesional. Capturando momentos únicos y creando recuerdos inolvidables.",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="antialiased bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+      <body className="antialiased bg-white">
         {children}
       </body>
     </html>
