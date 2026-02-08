@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Galería Fotográfica | Portfolio Profesional",
-  description: "Galería de fotografía profesional. Capturando momentos únicos y creando recuerdos inolvidables.",
+  title: "Tu Nombre | Fotógrafo Profesional",
+  description: "Portfolio de fotografía profesional. Especializado en paisajes, retratos y eventos. Capturando momentos únicos.",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
+    <html lang="es" className="scroll-smooth">
       <body className="antialiased bg-white">
         {children}
       </body>
