@@ -22,10 +22,13 @@ export default function Home() {
         </div>
         <div className="relative z-10 text-center px-4">
           <h1 className="text-7xl md:text-8xl font-bold text-white mb-6 tracking-tight">
-            Tu Nombre
+            Jose Jimenez
           </h1>
-          <p className="text-2xl md:text-3xl text-white/90 font-light mb-8">
-            Fotógrafo Profesional
+          <p className="text-lg md:text-xl text-white/70 tracking-widest uppercase mb-4">
+            Luz. Detalle. Intención.
+          </p>
+          <p className="text-xl md:text-2xl text-white/90 font-light italic mb-8">
+            La fotografía es mi forma de interpretar el mundo.
           </p>
           <a
             href="#portfolio"
@@ -56,13 +59,16 @@ export default function Home() {
         <div className="container mx-auto px-4 max-w-4xl text-center">
           <h2 className="text-5xl font-bold text-slate-900 mb-8">Sobre Mí</h2>
           <p className="text-xl text-slate-600 leading-relaxed mb-6">
-            Soy un fotógrafo apasionado por capturar la esencia de cada momento.
-            Con más de 10 años de experiencia, me especializo en fotografía de
-            paisajes, retratos y eventos.
+            La fotografía comenzó como una curiosidad y se convirtió en una
+            práctica constante. Me interesa la luz, la estructura y el
+            equilibrio dentro del encuadre.
+          </p>
+          <p className="text-xl text-slate-600 leading-relaxed mb-6">
+            Disfruto el proceso técnico tanto como el resultado final: entender
+            la exposición, ajustar el enfoque, trabajar la composición.
           </p>
           <p className="text-xl text-slate-600 leading-relaxed">
-            Mi objetivo es contar historias a través de imágenes que perduren
-            para siempre.
+            No busco capturar todo, solo aquello que realmente tiene intención.
           </p>
         </div>
       </section>
@@ -73,7 +79,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-5xl font-bold text-slate-900 mb-4">Portfolio</h2>
             <p className="text-xl text-slate-600">
-              Explora mi trabajo por categoría
+              Explora mi visión por categoría
             </p>
           </div>
           <CategoryGrid />
@@ -85,7 +91,7 @@ export default function Home() {
         <div className="container mx-auto px-4 max-w-4xl text-center">
           <h2 className="text-5xl font-bold mb-8">Trabajemos Juntos</h2>
           <p className="text-xl text-slate-300 mb-12">
-            ¿Tienes un proyecto en mente? Me encantaría escuchar tu historia.
+            ¿Tienes un proyecto en mente? Me encantaría explorar tu visión juntos.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <a
@@ -110,7 +116,7 @@ export default function Home() {
       <footer className="bg-black text-white py-8">
         <div className="container mx-auto px-4 text-center">
           <p className="text-slate-400">
-            © 2026 Tu Nombre. Todos los derechos reservados.
+            © 2026 Jose Jimenez. Todos los derechos reservados.
           </p>
         </div>
       </footer>

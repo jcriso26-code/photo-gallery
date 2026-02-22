@@ -11,7 +11,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <a href="#" className="text-2xl font-bold text-slate-900">
-            TU LOGO
+            JOSE JIMENEZ
           </a>
 
           {/* Desktop Menu */}
