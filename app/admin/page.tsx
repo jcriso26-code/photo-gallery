@@ -64,7 +64,10 @@ export default function AdminPage() {
         body: formData,
       });
 
-      if (!uploadResponse.ok) throw new Error("Error al subir la foto");
+      if (!uploadResponse.ok) {
+        const errData = await uploadResponse.json().catch(() => ({}));
+        throw new Error(errData.error || `Error al subir (status ${uploadResponse.status})`);
+      }
 
       const uploadData = await uploadResponse.json();
 
@@ -78,16 +81,19 @@ export default function AdminPage() {
         }),
       });
 
-      if (!saveResponse.ok) throw new Error("Error al guardar en BD");
+      if (!saveResponse.ok) {
+        const errData = await saveResponse.json().catch(() => ({}));
+        throw new Error(errData.error || `Error al guardar (status ${saveResponse.status})`);
+      }
 
       const saveData = await saveResponse.json();
       setPhotos(saveData.photos);
       setPhotoTitle("");
 
       alert("✅ Foto subida exitosamente!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error:", error);
-      alert("❌ Error al subir la foto. Intenta de nuevo.");
+      alert(`❌ Error al subir la foto: ${error.message || "Intenta de nuevo."}`);
     } finally {
       setUploading(false);
     }
