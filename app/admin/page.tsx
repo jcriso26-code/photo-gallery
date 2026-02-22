@@ -54,50 +54,56 @@ export default function AdminPage() {
   };
 
   const handleUpload = async (file: File) => {
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+      setUploading(true);
 
-    try {
-      const uploadResponse = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      try {
+        // Subir directo a Cloudinary desde el navegador (evita límite 4.5MB de Vercel)
+        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "photo-gallery-unsigned");
+        formData.append("folder", "photo-gallery");
 
-      if (!uploadResponse.ok) {
-        const errData = await uploadResponse.json().catch(() => ({}));
-        throw new Error(errData.error || `Error al subir (status ${uploadResponse.status})`);
+        const uploadResponse = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          { method: "POST", body: formData }
+        );
+
+        if (!uploadResponse.ok) {
+          const errData = await uploadResponse.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `Error al subir (status ${uploadResponse.status})`);
+        }
+
+        const uploadData = await uploadResponse.json();
+
+        // Guardar referencia en Redis via API
+        const saveResponse = await fetch("/api/photos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url: uploadData.secure_url,
+            category: selectedCategory,
+            title: photoTitle,
+          }),
+        });
+
+        if (!saveResponse.ok) {
+          const errData = await saveResponse.json().catch(() => ({}));
+          throw new Error(errData.error || `Error al guardar (status ${saveResponse.status})`);
+        }
+
+        const saveData = await saveResponse.json();
+        setPhotos(saveData.photos);
+        setPhotoTitle("");
+
+        alert("✅ Foto subida exitosamente!");
+      } catch (error: any) {
+        console.error("Error:", error);
+        alert(`❌ Error al subir la foto: ${error.message || "Intenta de nuevo."}`);
+      } finally {
+        setUploading(false);
       }
-
-      const uploadData = await uploadResponse.json();
-
-      const saveResponse = await fetch("/api/photos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url: uploadData.url,
-          category: selectedCategory,
-          title: photoTitle,
-        }),
-      });
-
-      if (!saveResponse.ok) {
-        const errData = await saveResponse.json().catch(() => ({}));
-        throw new Error(errData.error || `Error al guardar (status ${saveResponse.status})`);
-      }
-
-      const saveData = await saveResponse.json();
-      setPhotos(saveData.photos);
-      setPhotoTitle("");
-
-      alert("✅ Foto subida exitosamente!");
-    } catch (error: any) {
-      console.error("Error:", error);
-      alert(`❌ Error al subir la foto: ${error.message || "Intenta de nuevo."}`);
-    } finally {
-      setUploading(false);
-    }
-  };
+    };
 
   const handleDelete = async (index: number) => {
     if (!confirm("¿Eliminar esta foto?")) return;
