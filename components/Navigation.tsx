@@ -9,15 +9,15 @@ export default function Navigation() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex items-center justify-between h-24">
+        <div className="flex items-center justify-between h-28">
           {/* Logo */}
           <a href="#" className="flex items-center">
             <Image
               src="/Logo.png"
               alt="Jose Jimenez Fotografía"
-              width={140}
-              height={140}
-              className="invert"
+              width={200}
+              height={200}
+              className="invert -my-4"
             />
           </a>
 
