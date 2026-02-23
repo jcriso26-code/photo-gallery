@@ -15,9 +15,9 @@ export default function Navigation() {
             <Image
               src="/Logo.png"
               alt="Jose Jimenez Fotografía"
-              width={120}
-              height={120}
-              className=""
+              width={140}
+              height={140}
+              className="invert"
             />
           </a>
 
