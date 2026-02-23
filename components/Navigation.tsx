@@ -11,17 +11,14 @@ export default function Navigation() {
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3">
+          <a href="#" className="flex items-center">
             <Image
               src="/LogoFotografia.png"
               alt="Jose Jimenez Fotografía"
-              width={48}
-              height={48}
+              width={64}
+              height={64}
               className="rounded-full bg-black p-1"
             />
-            <span className="text-xl font-bold text-slate-900 hidden sm:inline">
-              Jose Jimenez
-            </span>
           </a>
 
           {/* Desktop Menu */}
