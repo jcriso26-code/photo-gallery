@@ -57,11 +57,17 @@ export default function AdminPage() {
       setUploading(true);
 
       try {
-        // Subir directo a Cloudinary desde el navegador (evita límite 4.5MB de Vercel)
-        const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+        // 1. Obtener firma del servidor
+        const signResponse = await fetch("/api/upload/sign");
+        if (!signResponse.ok) throw new Error("Error al obtener firma de upload");
+        const { signature, timestamp, apiKey, cloudName } = await signResponse.json();
+
+        // 2. Subir directo a Cloudinary con firma (evita límite 4.5MB de Vercel)
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("upload_preset", "photo-gallery-unsigned");
+        formData.append("signature", signature);
+        formData.append("timestamp", String(timestamp));
+        formData.append("api_key", apiKey);
         formData.append("folder", "photo-gallery");
 
         const uploadResponse = await fetch(
@@ -76,7 +82,7 @@ export default function AdminPage() {
 
         const uploadData = await uploadResponse.json();
 
-        // Guardar referencia en Redis via API
+        // 3. Guardar referencia en Redis
         const saveResponse = await fetch("/api/photos", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
