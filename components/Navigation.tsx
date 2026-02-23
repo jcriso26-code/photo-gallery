@@ -13,7 +13,7 @@ export default function Navigation() {
           {/* Logo */}
           <a href="#" className="flex items-center">
             <Image
-              src="/LogoFotografia.png"
+              src="/Logo.png"
               alt="Jose Jimenez Fotografía"
               width={80}
               height={80}
