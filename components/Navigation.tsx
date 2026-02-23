@@ -15,8 +15,8 @@ export default function Navigation() {
             <Image
               src="/LogoFotografia.png"
               alt="Jose Jimenez Fotografía"
-              width={64}
-              height={64}
+              width={80}
+              height={80}
               className="rounded-full bg-black p-1"
             />
           </a>
