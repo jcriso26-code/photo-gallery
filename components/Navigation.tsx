@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,8 +11,17 @@ export default function Navigation() {
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#" className="text-2xl font-bold text-slate-900">
-            JOSE JIMENEZ
+          <a href="#" className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="Jose Jimenez Fotografía"
+              width={48}
+              height={48}
+              className="rounded-full bg-black p-1"
+            />
+            <span className="text-xl font-bold text-slate-900 hidden sm:inline">
+              Jose Jimenez
+            </span>
           </a>
 
           {/* Desktop Menu */}
