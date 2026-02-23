@@ -17,7 +17,7 @@ export default function Navigation() {
               alt="Jose Jimenez Fotografía"
               width={120}
               height={120}
-              className="rounded-full bg-black p-1"
+              className=""
             />
           </a>
 
